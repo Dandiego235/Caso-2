@@ -11,14 +11,14 @@ class Node{
     private:
         Node<T> *next;
     public:
-        T *structure;
+        T *structure; // El nodo apunta a una estructura, un struct o clase.
         Node(){
             next = nullptr;
             structure = nullptr;
         }
         Node(T *pointer){
             next = nullptr;
-            structure = pointer;
+            structure = pointer; // Se establece el puntero de la estructura como el puntero ingresado.
         }
 
         Node<T>* getNext(){

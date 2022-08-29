@@ -1,3 +1,9 @@
+/* Caso 2: Estructuras de datos
+Por: Daniel Granados Retana
+Profesor: Rodrigo Núñez
+Fecha: 29 de agosto del 2022
+*/
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -16,27 +22,6 @@
 #include "TomaCorriente.cpp"
 
 using namespace std;
-
-/* Estructura para declarar subclases de distintos dispositivos.
-class TipoDispositivo : public Device{ // Subclase que hereda las características de Device para opjetos del tipo.
-    public:
-        Bombillo(List<Tparameter> paramsTipo, List<Taction> pActions, string pName){
-            this->deviceType = "Tipo";
-            this->name = pName;
-            this->params = paramsTipo;
-            this->actions = pActions;
-        }
-};*/
-
-/* Estructura para crear nuevas tareas. Solo hace falta cambiarle el nombre a la función para crear una nueva tarea.
-   Lo que la tarea haga se especifica en el main.
-void nombreTarea (List<Room> *House, vector<vector<string>> tasks){ // tasks = {{Room, Type, Name, Action, Parameter, Value},...}
-    for (int device = 0; device < tasks.size(); device++){
-        Device *roomDevice = House->findStruct(tasks[device][ROOM])->Devices.findDevice(tasks[device][DEVICETYPE], tasks[device][NAME]);
-        cout << roomDevice->deviceType << " " << roomDevice->name << endl;
-        roomDevice->actions.findStruct(tasks[device][ACTION])->execute(tasks[device][PARAMETER], tasks[device][VALUE]);
-    }   
-}*/
 
 int main(){
     List<Tparameter> parametersBo; // Se crea lista de parámetros de bombillo
@@ -222,10 +207,3 @@ int main(){
     //bombillo1->getParams(); // instrucciones para obtener los parámetros y acciones de un dispositivo
     //bombillo1->getActions();
 }
-
-//Cuarto->Devices.findDevice("Bombillo", "Cuarto")->actions.findStruct("Encender")->execute("Brillo", "Alto");
-//bombillo1->actions.findStruct("Encender")->execute("Brillo", "Alto");
-//accion1Bombillo->execute("Color", "Rojo");
-//accion1Bombillo->execute("Color", "Azul");
-//cout << param2Bombillo->value << endl;
-//Cuarto->Devices.findDevice("Bombillo", "Cuarto")->actions.findStruct("Encender")->execute("Brillo", "Alto");
