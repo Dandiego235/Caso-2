@@ -67,6 +67,17 @@ class Bombillo : public Device{ // Subclase que hereda las características de D
         }
 };
 
+/* Estructura para declarar subclases de distintos dispositivos.
+class TipoDispositivo : public Device{ // Subclase que hereda las características de Device para opjetos del tipo.
+    public:
+        Bombillo(List<Tparameter> paramsTipo, List<Taction> pActions, string pName){
+            this->deviceType = "Tipo";
+            this->name = pName;
+            this->params = paramsTipo;
+            this->actions = pActions;
+        }
+};*/
+
 class SensorPuertas : public Device{ // Subclase que hereda las características de Device para los Sensores de puertas.
     public:
         SensorPuertas(List<Tparameter> paramsSensorPuertas, List<Taction> pActions, string pName){
@@ -127,38 +138,51 @@ typedef struct Room { // Estructura para los cuartos con una lista de dispositiv
 }*RoomPtr;
 
 
-void buenosDias(List<Room> *House, vector<vector<string>> tasks){ // tasks = {{Room, Type, Name, Action, Parameter, Value},...}
-    for (int device = 0; device < tasks.size(); device++){ // Itera por cada dispositivo de la lista de acciones que se van a agregar en la tarea de buenosDias
+struct Ttarea {
+    string name;
+    vector<vector<string>> tasks;
+    List<Room> *House;
+
+    Ttarea (string pName, List<Room> *pHouse, vector<vector<string>> pTasks) : name(pName), House(pHouse), tasks(pTasks) { }
+
+    void llamarTarea(){ // tasks = {{Room, Type, Name, Action, Parameter, Value},...}
+        cout << this->name << endl;
+        for (int device = 0; device < tasks.size(); device++){ 
+            // Itera por cada dispositivo de la lista de acciones que se van a agregar en la tarea de buenosDias
+            Device *roomDevice = House->findStruct(tasks[device][ROOM])->Devices.findDevice(tasks[device][DEVICETYPE], tasks[device][NAME]);
+            //                  Encuentra el cuarto en la casa    Accede a la lista de dispositivos y encuentra el objeto del dispositivo correcto
+            cout << roomDevice->deviceType << " " << roomDevice->name << endl;
+            //       imprime el tipo y el nombre
+
+            roomDevice->actions.findStruct(tasks[device][ACTION])->execute(tasks[device][PARAMETER], tasks[device][VALUE]);
+            // ejecuta la acción dada con el parámetro y valor dados.
+        }   
+    }
+};
+
+/* Estructura para crear nuevas tareas. Solo hace falta cambiarle el nombre a la función para crear una nueva tarea.
+   Lo que la tarea haga se especifica en el main.
+void nombreTarea (List<Room> *House, vector<vector<string>> tasks){ // tasks = {{Room, Type, Name, Action, Parameter, Value},...}
+    for (int device = 0; device < tasks.size(); device++){
         Device *roomDevice = House->findStruct(tasks[device][ROOM])->Devices.findDevice(tasks[device][DEVICETYPE], tasks[device][NAME]);
-        //                  Encuentra el cuarto en la casa    Accede a la lista de dispositivos y encuentra el objeto del dispositivo correcto
         cout << roomDevice->deviceType << " " << roomDevice->name << endl;
-        //       imprime el tipo y el nombre
-
         roomDevice->actions.findStruct(tasks[device][ACTION])->execute(tasks[device][PARAMETER], tasks[device][VALUE]);
-        // ejecuta la acción dada con el parámetro y valor dados.
-
-        /*cout << House->findStruct(tasks[device][ROOM])->Devices.findDevice(tasks[device][DEVICETYPE], tasks[device][NAME])->deviceType << " ";
-        //Encuentra el cuarto en la casa    Accede a la lista de dispositivos y encuentra el objeto del dispositivo correcto e imprime el tipo. 
-        cout << House->findStruct(tasks[device][ROOM])->Devices.findDevice(tasks[device][DEVICETYPE], tasks[device][NAME])->name << endl;
-        //Encuentra el cuarto en la casa    Accede a la lista de dispositivos y encuentra el objeto del dispositivo correcto e imprime el nombre. 
-        House->findStruct(tasks[device][ROOM])->Devices.findDevice(tasks[device][DEVICETYPE], tasks[device][NAME])->actions.findStruct(tasks[device][ACTION])
-        ->execute(tasks[device][PARAMETER], tasks[device][VALUE]);*/
     }   
-}
+}*/
 
 int main(){
     List<Tparameter> parametersBo; // Se crea lista de parámetros de bombillo
     PtrParam param1Bombillo = new Tparameter("Brillo"); // se agregan parámetros a la lista.
-    parametersBo.add(param1Bombillo);
     PtrParam param2Bombillo = new Tparameter("Color");
-    parametersBo.add(param2Bombillo);
     PtrParam param3Bombillo = new Tparameter("Tamaño");
+    parametersBo.add(param1Bombillo);
+    parametersBo.add(param2Bombillo);
     parametersBo.add(param3Bombillo);
 
     List<Taction> accionesBo; // Se crea la lista de acciones del bombillo
-    PtrAction accion1Bombillo = new Taction("Encender", parametersBo, {"Brillo", "Color"}); // Se agregan acciones a la lista.
-    accionesBo.add(accion1Bombillo);
+    PtrAction accion1Bombillo = new Taction("Encender", parametersBo, {"Brillo", "Color"});
     PtrAction accion2Bombillo = new Taction("Apagar", parametersBo, {"Brillo", "Color"});
+    accionesBo.add(accion1Bombillo); // Se agregan acciones a la lista.
     accionesBo.add(accion2Bombillo);
     
     List<Tparameter> parametersSP; // Parámetros y acciones del Sensor de puertas
@@ -247,23 +271,19 @@ int main(){
     accionesTC.add(accion1TC);
     accionesTC.add(accion2TC);
 
-    Bombillo *bombillo1 = new Bombillo(parametersBo, accionesBo, "Cuarto Cama"); // Se crean unos bombillos
-    //bombillo1->actions.findStruct("Encender")->execute("Brillo", "Alto");
-    //accion1Bombillo->execute("Color", "Rojo");
-    //accion1Bombillo->execute("Color", "Azul");
-    //cout << param2Bombillo->value << endl;
+    Bombillo *bombillo1 = new Bombillo(parametersBo, accionesBo, "Cuarto Cama"); // Se crean unos bombillos y otros dispositivos
     Bombillo *bombillo2 = new Bombillo(parametersBo, accionesBo, "Cuarto Techo");
     Alarma *alarma1 = new Alarma(parametersAl, accionesAl, "Despertador");
     SensorPuertas *sensorPuertas1 = new SensorPuertas(parametersSP, accionesSP, "Cuarto");
     TomaCorriente *tomaCorriente1 = new TomaCorriente(parametersTC, accionesTC, "Cuarto");
 
-    Room *Cuarto = new Room("Cuarto");
+    Room *Cuarto = new Room("Cuarto"); // Se crea un cuarto y se le asignan los bombillos
     Cuarto->Devices.add(bombillo1);
     Cuarto->Devices.add(bombillo2);
     Cuarto->Devices.add(alarma1);
     Cuarto->Devices.add(sensorPuertas1);
     Cuarto->Devices.add(tomaCorriente1);
-    //Cuarto->Devices.findDevice("Bombillo", "Cuarto")->actions.findStruct("Encender")->execute("Brillo", "Alto");
+    
 
     Room *Cocina = new Room("Cocina");
     Bombillo *bombillo3 = new Bombillo(parametersBo, accionesBo, "Cocina 1");
@@ -286,24 +306,39 @@ int main(){
     Bano->Devices.add(bombillo5);
     Bano->Devices.add(tomaCorriente3);
 
-    List<Room> *Casa = new List<Room>();
+    List<Room> *Casa = new List<Room>(); // Se agrupan los cuartos en una casa.
     Casa->add(Cuarto);
     Casa->add(Cocina);
     Casa->add(Bano);
 
+    List<Ttarea> *Tareas = new List<Ttarea>();
 
-
-    buenosDias(Casa, {{"Cuarto", "Bombillo", "Cuarto Cama", "Apagar", "Brillo", "Apagado"}, 
+    vector<vector<string>> buenosDiasVec = {{"Cuarto", "Bombillo", "Cuarto Cama", "Apagar", "Brillo", "Apagado"}, 
     {"Cuarto", "Bombillo", "Cuarto Cama", "Apagar", "Color", "Ninguno"},
     {"Cocina", "Coffee Maker", "Cocina", "Encender", "Actividad", "Encendido"},
     {"Cocina", "Coffee Maker", "Cocina", "Preparar", "Modo", "Haciendo café"},
     {"Baño", "Bombillo", "Baño", "Encender", "Brillo", "Alto"},
     {"Baño", "Bombillo", "Baño", "Encender", "Color", "Blanco"},
     {"Cuarto", "Alarma", "Despertador", "Apagar", "Sonido", "Apagado"},
-    {"Cuarto", "Toma Corriente", "Cuarto", "Encender", "Actividad", "Encendido"}});
+    {"Cuarto", "Toma Corriente", "Cuarto", "Encender", "Actividad", "Encendido"}};
+
+    Ttarea *buenosDias = new Ttarea("Buenos días", Casa, buenosDiasVec);
+
+    Tareas->add(buenosDias);
+
+    Tareas->findStruct("Buenos días")->llamarTarea(); // Con el string del nombre puedo llamar a la tarea.
+    
+    // Estructura de cada dispositivo en el vector de acciones en la tarea.
+    // {"Nombre del cuarto", "Nombre del tipo", "Nombre del disp", "Nombre de accion", "Nombre de param", "Valor de param"}
+
+    vector<vector<string>> trabajar = {{""}};
     //bombillo1->getParams();
     //bombillo1->getActions();
 }
 
-
+//Cuarto->Devices.findDevice("Bombillo", "Cuarto")->actions.findStruct("Encender")->execute("Brillo", "Alto");
+//bombillo1->actions.findStruct("Encender")->execute("Brillo", "Alto");
+//accion1Bombillo->execute("Color", "Rojo");
+//accion1Bombillo->execute("Color", "Azul");
+//cout << param2Bombillo->value << endl;
 //Cuarto->Devices.findDevice("Bombillo", "Cuarto")->actions.findStruct("Encender")->execute("Brillo", "Alto");
